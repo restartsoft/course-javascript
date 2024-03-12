@@ -11,6 +11,10 @@
    createDivWithText('loftschool') // создаст элемент div, поместит в него 'loftschool' и вернет созданный элемент
  */
 function createDivWithText(text) {
+  const element = document.createElement('div');
+  element.textContent = text;
+
+  return element;
 }
 
 /*
@@ -22,6 +26,7 @@ function createDivWithText(text) {
    prepend(document.querySelector('#one'), document.querySelector('#two')) // добавит элемент переданный первым аргументом в начало элемента переданного вторым аргументом
  */
 function prepend(what, where) {
+  where.prepend(what);
 }
 
 /*
@@ -44,29 +49,38 @@ function prepend(what, where) {
    findAllPSiblings(document.body) // функция должна вернуть массив с элементами div и span т.к. следующим соседом этих элементов является элемент с тегом P
  */
 function findAllPSiblings(where) {
+  const array = [];
+  for (const el of where.children) {
+    if (el.nextElementSibling?.nodeName === 'P') {
+      array.push(el);
+    }
+    console.log(el);
+  }
+
+  return array;
 }
 
 /*
  Задание 4:
-
+ 
  Функция представленная ниже, перебирает все дочерние узлы типа "элемент" внутри узла переданного в параметре where и возвращает массив из текстового содержимого найденных элементов
  Но похоже, что в код функции закралась ошибка и она работает не так, как описано.
-
+ 
  Необходимо найти и исправить ошибку в коде так, чтобы функция работала так, как описано выше.
-
+ 
  Пример:
    Представим, что есть разметка:
    <body>
       <div>привет</div>
       <div>loftschool</div>
    </body>
-
+ 
    findError(document.body) // функция должна вернуть массив с элементами 'привет' и 'loftschool'
  */
 function findError(where) {
   const result = [];
 
-  for (const child of where.childNodes) {
+  for (const child of where.children) {
     result.push(child.textContent);
   }
 
@@ -75,22 +89,29 @@ function findError(where) {
 
 /*
  Задание 5:
-
+ 
  Функция должна перебрать все дочерние узлы элемента переданного в параметре where и удалить из него все текстовые узлы
-
+ 
  Задачу необходимо решить без использования рекурсии, то есть можно не уходить вглубь дерева.
  Так же будьте внимательны при удалении узлов, т.к. можно получить неожиданное поведение при переборе узлов
-
+ 
  Пример:
    После выполнения функции, дерево <div></div>привет<p></p>loftchool!!!
    должно быть преобразовано в <div></div><p></p>
  */
 function deleteTextNodes(where) {
+  for (const el of where.childNodes) {
+    if (el.nodeType === 3) {
+      where.removeChild(el);
+    }
+  }
+
+  return where;
 }
 
 /*
  Задание 6 *:
-
+ 
  Необходимо собрать статистику по всем узлам внутри элемента переданного в параметре root и вернуть ее в виде объекта
  Статистика должна содержать:
  - количество текстовых узлов
@@ -98,7 +119,7 @@ function deleteTextNodes(where) {
  - количество элементов каждого тега
  Для работы с классами рекомендуется использовать classList
  Постарайтесь не создавать глобальных переменных
-
+ 
  Пример:
    Для дерева <div class="some-class-1"><b>привет!</b> <b class="some-class-1 some-class-2">loftschool</b></div>
    должен быть возвращен такой объект:
@@ -109,6 +130,52 @@ function deleteTextNodes(where) {
    }
  */
 function collectDOMStat(root) {
+  const result = {
+    tags: {},
+    classes: {},
+    texts: 0,
+  };
+
+  function collectClassStat(classList) {
+    for (const classEl of classList.values()) {
+      result.classes[classEl] =
+        result.classes[classEl] == null ? 1 : result.classes[classEl] + 1;
+    }
+  }
+
+  function collectElementStat(parentEl) {
+    for (const el of parentEl.childNodes) {
+      console.log(el, el.nodeType, el.nodeName);
+      if (el.nodeType === 1) {
+        result.tags[el.nodeName] =
+          result.tags[el.nodeName] == null ? 1 : result.tags[el.nodeName] + 1;
+        collectClassStat(el.classList);
+      } else if (el.nodeType === 3) {
+        result.texts++;
+      }
+
+      if (el.hasChildNodes()) {
+        collectElementStat(el);
+      }
+    }
+  }
+
+  for (const el of root.childNodes) {
+    console.log(el, el.nodeType, el.nodeName);
+    if (el.nodeType === 1) {
+      result.tags[el.nodeName] =
+        result.tags[el.nodeName] == null ? 1 : result.tags[el.nodeName] + 1;
+      collectClassStat(el.classList);
+    } else if (el.nodeType === 3) {
+      result.texts++;
+    }
+
+    if (el.hasChildNodes()) {
+      collectElementStat(el);
+    }
+  }
+
+  return result;
 }
 
 export {
