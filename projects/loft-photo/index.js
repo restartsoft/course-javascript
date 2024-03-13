@@ -1,3 +1,13 @@
+import pages from './pages';
+import('./styles.css');
+
+const pageNames = ['login', 'main', 'profile'];
+
+document.addEventListener('click', () => {
+  const page = lp.getRandomElement(pageNames);
+  pages.openPage(page);
+});
+
 const lp = {
   getRandomElement(array) {
     const maxRandomIndex = array.length;
@@ -35,3 +45,7 @@ photo = lp.getNextPhoto();
 
 console.log(photo.friend); // { firstName: 'Сергей' }
 console.log(photo.url);
+
+pages.openPage('main'); // сделать видимым элемент с классом page-main
+pages.openPage('profile'); // сделать видимым элемент с классом page-profile, а page-main скрыть
+pages.openPage('login'); // сделать видимым элемент с классом page-login, а page-profile скрыть
