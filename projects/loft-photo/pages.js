@@ -7,7 +7,6 @@ const pagesMap = {
 export default {
   openPage(name) {
     const activeElement = document.querySelector('[active]');
-    //const element = document.querySelector(`.page-${name}`);
     const element = document.querySelector(pagesMap[name]);
 
     if (activeElement !== null && activeElement !== element) {
